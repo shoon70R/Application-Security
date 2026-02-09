@@ -85,12 +85,12 @@ namespace WebApplication1.Services
                     await client.DisconnectAsync(true);
                 }
 
-                _logger.LogInformation($"Email sent successfully to {toEmail}");
+                _logger.LogInformation("Email sent successfully.");
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error sending email to {toEmail}: {ex.Message}");
+                _logger.LogError(ex, "Error sending email.");
                 return false;
             }
         }
