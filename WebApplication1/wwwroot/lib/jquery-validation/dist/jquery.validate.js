@@ -695,8 +695,16 @@ $.extend( $.validator, {
 				return selector[ 0 ];
 			}
 
-			// Fallback: use jQuery to resolve other selector types
-			return $( selector )[ 0 ];
+			// If an array-like collection of elements is passed, return the first element
+			if ( selector && typeof selector.length === "number" && selector.length > 0 ) {
+				if ( selector[ 0 ] && selector[ 0 ].nodeType === 1 ) {
+					return selector[ 0 ];
+				}
+			}
+
+			// For any other input types, do not attempt to resolve via jQuery to avoid
+			// interpreting untrusted strings as HTML or selectors
+			return null;
 		},
 
 		errors: function() {
