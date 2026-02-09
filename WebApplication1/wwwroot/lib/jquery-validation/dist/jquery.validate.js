@@ -1097,9 +1097,18 @@ $.extend( $.validator, {
 			if ( this.checkable( element ) ) {
 				var groupElements = this.findByName( element.name );
 
-				// Ensure we are working with a jQuery collection
+				// Ensure we are working with a jQuery collection built only from DOM elements
 				if ( groupElements && !groupElements.jquery ) {
-					groupElements = $( groupElements );
+					var safeGroupElements = [];
+
+					// Normalize array-like collections into a plain array of element nodes
+					for ( var i = 0; i < groupElements.length; i++ ) {
+						if ( groupElements[ i ] && groupElements[ i ].nodeType === 1 ) {
+							safeGroupElements.push( groupElements[ i ] );
+						}
+					}
+
+					groupElements = $( safeGroupElements );
 				}
 
 				element = groupElements && groupElements.length ? groupElements[ 0 ] : element;
