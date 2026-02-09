@@ -684,6 +684,18 @@ $.extend( $.validator, {
 		},
 
 		clean: function( selector ) {
+
+			// If a DOM element is passed, return it directly
+			if ( selector && selector.nodeType === 1 ) {
+				return selector;
+			}
+
+			// If a jQuery object is passed, return its first element
+			if ( selector && selector.jquery ) {
+				return selector[ 0 ];
+			}
+
+			// Fallback: use jQuery to resolve other selector types
 			return $( selector )[ 0 ];
 		},
 
@@ -1063,13 +1075,42 @@ $.extend( $.validator, {
 
 		validationTargetFor: function( element ) {
 
-			// If radio/checkbox, validate first element in group instead
-			if ( this.checkable( element ) ) {
-				element = this.findByName( element.name );
+			// Normalize falsy values early
+			if ( !element ) {
+				return element;
 			}
 
-			// Always apply ignore filter
-			return $( element ).not( this.settings.ignore )[ 0 ];
+			// If a jQuery object is passed, use its first element
+			if ( element.jquery ) {
+				element = element[ 0 ];
+			}
+
+			// If radio/checkbox, validate first element in group instead
+			if ( this.checkable( element ) ) {
+				var groupElements = this.findByName( element.name );
+
+				// Ensure we are working with a jQuery collection
+				if ( groupElements && !groupElements.jquery ) {
+					groupElements = $( groupElements );
+				}
+
+				element = groupElements && groupElements.length ? groupElements[ 0 ] : element;
+			}
+
+			// Always apply ignore filter using a jQuery collection built from DOM elements
+			var elementsToFilter = [];
+
+			if ( element ) {
+
+				// If we somehow received a jQuery object here, extract its elements
+				if ( element.jquery ) {
+					elementsToFilter = element.get();
+				} else {
+					elementsToFilter = [ element ];
+				}
+			}
+
+			return $( elementsToFilter ).not( this.settings.ignore )[ 0 ];
 		},
 
 		checkable: function( element ) {
