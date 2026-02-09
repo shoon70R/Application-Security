@@ -1127,7 +1127,15 @@ $.extend( $.validator, {
 				}
 			}
 
-			return $( elementsToFilter ).not( this.settings.ignore )[ 0 ];
+			// Sanitize the collection to ensure we only pass DOM elements to jQuery
+			var safeElements = [];
+			for ( var j = 0; j < elementsToFilter.length; j++ ) {
+				if ( elementsToFilter[ j ] && elementsToFilter[ j ].nodeType === 1 ) {
+					safeElements.push( elementsToFilter[ j ] );
+				}
+			}
+
+			return $( safeElements ).not( this.settings.ignore )[ 0 ];
 		},
 
 		checkable: function( element ) {
